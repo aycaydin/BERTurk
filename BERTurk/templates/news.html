@@ -11,9 +11,45 @@
     </header>
     <main>
         <input type="button" onclick="location.href='/';" value="Main Page" />
+        <p id="rScore">ROUGE-1 Score: {{ rScore }}</p>
+        <textarea id="copiedText"></textarea>
+        <p id="copyText">Text: {{ copy }}</p>
+        <button id="randomScoreButtom">Random ROUGE-1 Score</button>
+        <p id="info">"{{ copy }}" text copied {{ count }} times</p>
+
     </main>
     <footer>
         <p>&copy; BERTurk News Page</p>
     </footer>
+    <script>
+        document.getElementById("randomScoreButtom").addEventListener("click", function () {
+            //Random ROUGE-1 Score value and copied text
+            //Get text from "copiedText" text area
+            const inputText = document.getElementById("copiedText").value.trim();
+            fetch('/rscore_increase',{
+                method: 'POST',
+                headers:{'Content-Type': 'application/json'},
+                //Stringify text
+                body: JSON.stringify({ text: inputText })
+            })
+            .then(response => {
+                if (!response.ok)
+                {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                //Change rScore from randomized rScore by berturk.py
+                document.getElementById("rScore").innerText = `ROUGE-1 Score: ${data.rScore}`;
+                //Change count from count in berturk.py
+                document.getElementById("info").innerText = `"${inputText}" text copied ${data.count} times`;
+                //Change text from copied text
+                document.getElementById("copyText").innerText = `Text: ${data.copy}`;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+    </script>
 </body>
 </html>
